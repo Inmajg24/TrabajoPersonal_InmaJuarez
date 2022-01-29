@@ -217,15 +217,16 @@ No podemos hacerlo como la comprobacion 1 ya que la columna sched_dep_time está
 vueloscancelados <-  vuelos %>%
   mutate(cancelado = (is.na(arr_delay) | is.na(arr_delay))) %>%
   group_by(year, month, day) %>%
-  summarise(num_cancelado = sum(cancelado), num_vuelo = n(),)
+  summarise(vuelos_cancelado = sum(cancelado), numero_vuelos = n(),)
 
 ggplot(vueloscancelados) +
-  geom_line(aes(x = num_vuelo, y = num_cancelado, col= num_vuelo,)) 
+  geom_line(aes(x = numero_vuelos, y = vuelos_cancelado, 
+                col = numero_vuelos,))
 
-
+  
 ```
 
-
+Los días que tienen mayor numero de vuelos programados, sufren mayor numero de cancelaciones diarias. Se ven algunas excepciones donde hay dias con poco vuelos que hya un numero muy elevado de vuelos cancelados. Pero en lineas generales, a mayor numero de vuelos programados en el dia, mayor numero de vuelos cancelados. 
 
 ### 17. Investiga si la proporción de vuelos cancelados está relacionada con el retraso promedio por día en los vuelos. 
 
@@ -247,7 +248,7 @@ ggplot(proptardanz_cancel) +
 
 ```
 
-
+En este gráfico no vemos que exista una relación clara entre la proporción de vuelos cancelados y el retraso promedio por dia. Si es cierto que los días con mayor retraso acumulado presentan mayor numero de vuelos cancelados. Aunque hay algunos dias con poco retraso acumulado y muchos vuelos cancelados, por lo que no afirmamos una relación directa entre ambas variables. 
 
 
 
@@ -297,6 +298,7 @@ Prop_retraso_cancel <-
 
 ggplot(Prop_retraso_cancel) +
   geom_line(aes(x = med_dep_delay, y = prop_cancelados, col= prop_cancelados))
+  
 ```
 
 
@@ -317,6 +319,9 @@ vuelos %>%
    summarise(dep_delay = mean(dep_delay, na.rm = TRUE)) %>%
    arrange(desc(dep_delay))
 ```
+
+
+La compañia aerea que sufre más retrasos en cuanto a retrasos en hora de  salida como retrasos en la hora de  llegada es F9.
 
 
 ### 20. Queremos saber qué hora del día nos conviene volar si queremos evitar los retrasos en la salida.
@@ -413,6 +418,9 @@ vuelos_dt %>%
   geom_point() +
   geom_smooth()
 ```
+
+Los retrasos a lo largo del dia son mayores. Puede deberse a una acumulación de personasn que viaja en estas horas. Los viajes nocturnos y de madrugada acumulan menor número de atrasos.
+
 
 ### 25. URL
 
