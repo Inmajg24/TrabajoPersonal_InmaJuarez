@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
     
-##Analizando dataset nycflights13:: flights
+## Analizando dataset nycflights13:: flights
 
 ```{r}
 
@@ -28,72 +28,91 @@ vuelos <- nycflights13::flights
 
 ```{r}
 
-
-Retraso_1h <- vuelos[vuelos$arr_delay > 60, ]
+Retraso_1h <- filter(vuelos, arr_delay > 60)
 
 Retraso_1h
-
-dim(filter(vuelos, arr_delay > 60))
 
 dim(Retraso_1h)
 
 ```
 
 
+Hubo 27789 vuelos que llegaron 1 hora más tarde de lo previsto. En la tabla se puede observar todos los datos de esos vuelos retrasados más de una hora. 
+
+
 ### 2. Encuentra todos los vuelos que volaron hacia San Francisco (aeropuertos SFO y OAK) 
 
 ```{r}
 
-filter(vuelos, dest == "SFO"  | dest == "OAK")
+Vuelos_SanF <- filter(vuelos, dest == "SFO"  | dest == "OAK")
+Vuelos_SanF
+
+dim(Vuelos_SanF)
 
 ```
+
+Hubo 13643 vuelos hacia San Franciso incluyendo los dos aeropuertos. 
 
 
 ### 3. Encuentra todos los vuelos operados por United American (UA) o por American Airlines (AA) 
 
 ```{r}
 
-filter(vuelos, carrier == "UA"  | carrier == "AA")
+Vuelos_American <- filter(vuelos, carrier == "UA"  | carrier == "AA")
+Vuelos_American
 
+dim(Vuelos_American)
 
 ```
+Hubo 91394 vuelos operados por las aerolinias UA y AA. 
+
 
 ### 4. Encuentra todos los vuelos que salieron los meses de primavera (Abril, Mayo y Junio) 
 
 
 ```{r}
 
-dim(filter(vuelos, month == 4  | month == 5 |  month == 6))
+vuelos_primavera <- filter(vuelos, month == 4  | month == 5 |  month == 6)
+vuelos_primavera
 
-
-
+dim(vuelos_primavera)
 ```
+
+Hubo 85369 vuelos en los meses de primavera
+
 
 ### 5. Encuentra todos los vuelos que llegaron más de una hora tarde pero salieron con menos de una hora de retraso. 
 
 ```{r}
 
+filter(vuelos, arr_delay > 60  & dep_delay < 60)
+
 dim(filter(vuelos, arr_delay > 60  & dep_delay < 60))
 
 ```
-
+Hubo 4956 vuelos que llegaron con mas de una hora de retraso pero salieron con menos de una hora de retraso.
 
 ### 6. Encuentra todos los vuelos que salieron con más de una hora de retraso pero consiguieron llegar con menos de 30 minutos de retraso (el avión aceleró en el aire) 
 
 ```{r}
 
+filter(vuelos, arr_delay < 30  & dep_delay > 60)
+
 dim(filter(vuelos, arr_delay < 30  & dep_delay > 60))
 
 ```
-
+Hubo 181 vuelos donde el avión accelero en el aire. Salieron con más de una hora de retraso pero llegaron con menos de 30 minutos de retraso. 
 
 ### 7. Encuentra todos los vuelos que salen entre medianoche y las 7 de la mañana (vuelos nocturnos). 
 
 ```{r}
   
+filter(vuelos, dep_time > 0 & dep_time <= 700)
 dim(filter(vuelos, dep_time > 0 & dep_time <= 700))
  
 ```
+
+Hubo 31958 vuelos nocturnos.
 
 
 ### 8. ¿Cuántos vuelos tienen un valor desconocido de dep_time?
@@ -101,7 +120,8 @@ dim(filter(vuelos, dep_time > 0 & dep_time <= 700))
 ```{r}
 
 Desconocido <- which(is.na(vuelos$dep_time))
-length(Desconocido)
+
+print(paste0( "Hay ", length(Desconocido), " vuelos con un valor desconocido en la varible dep_time."))
 
 ```
 ### 9. ¿Qué variables del dataset contienen valores desconocidos?
@@ -126,6 +146,8 @@ Retraso <- arrange(vuelos, desc(dep_delay))
 
 Adelanto <- arrange(vuelos, dep_delay)
 
+Retraso
+Adelanto
 ```
 
 El primer vuelo que salió antes de los previsto fue: N592JB, con 43 minutos de antelación. 
@@ -134,8 +156,6 @@ El primer vuelo que salió antes de los previsto fue: N592JB, con 43 minutos de 
 ### 11. Ordena los vuelos de flights para encontrar los vuelos más rápidos. Usa el concepto de rapidez que consideres. 
 
 ```{r}
-
-
 vuelos$Rapidez <- (vuelos$distance / vuelos$air_time)
 
 arrange(vuelos, desc(Rapidez))
@@ -147,8 +167,6 @@ El concepto de rapidez empleado  es la velocidad a la que van los aviones. El ma
 ### 12. ¿Qué vuelos tienen los trayectos más largos? 
 
 ```{r}
-
-
 arrange(vuelos, desc(distance))
 
 ```
@@ -159,7 +177,6 @@ El vuelo más largo es N380HA, con una distancia de  4983 millas.
 ### 13. ¿Qué vuelos tienen los trayectos más cortos? 
 
 ```{r}
-
 arrange(vuelos, distance)
 ```
 
@@ -172,7 +189,9 @@ El primer vuelo que nos aparece tiene una distancia de 17, pero suponemos que fu
 
 Vuelos_nuevo <- mutate(vuelos, salida_programada_min = (sched_dep_time %/% 100 * 60 + sched_dep_time %% 100) %% 1440, salida_min = (dep_time %/% 100 * 60 + dep_time %% 100) %% 1440)
 
+Vuelos_nuevo
 ```
+
 
 
 ### 15. Compara los valores de dep_time, sched_dep_time y dep_delay. ¿Cómo deberían relacionarse estos tres números? Compruébalo y haz las correcciones numéricas que necesitas.
@@ -187,7 +206,7 @@ Vuelos_nuevo$Comprobacion2 <- Vuelos_nuevo$salida_programada_min + Vuelos_nuevo$
 ```
 
 
-Estas tres variables se relacionan de la siguiente manera: dep_tiem = sched_dep_time + dep_delay. La comprobacion2 es la correcta, ya que para darnos la hora exacta a la que sale el vuelo sumamos la salida programada en minuto mas el tiempo que se ha retrasado el vuelo. De esta forma nos da la hora real de salida en minutos. 
+Estas tres variables se relacionan de la siguiente manera: dep_tiem = sched_dep_time + dep_delay. La comprobacion2 es la correcta, ya que para darnos la hora exacta a la que sale el vuelo sumamos la salida programada en minutos mas el tiempo que se ha retrasado el vuelo. De esta forma nos da la hora real de salida en minutos. 
 No podemos hacerlo como la comprobacion 1 ya que la columna sched_dep_time está en unidades diferentes (en hora).
 
 
@@ -248,6 +267,8 @@ ggplot(Prop_retraso_cancel) +
   geom_line(aes(x = med_dep_delay, y = prop_cancelados, col= prop_cancelados))
 
 ```
+
+
 ```{r}
 JFK <- filter(vuelos, origin=="JFK")
 
@@ -260,6 +281,10 @@ Prop_retraso_cancel <-
 ggplot(Prop_retraso_cancel) +
   geom_line(aes(x = med_dep_delay, y = prop_cancelados, col= prop_cancelados))
 ```
+```
+
+
+
 
 ```{r}
 EWR <- filter(vuelos, origin=="EWR")
@@ -275,7 +300,7 @@ ggplot(Prop_retraso_cancel) +
 ```
 
 
-### 19.¿Qué compañía aérea sufre los peores retrasos?
+### 19.¿Qué compañía aérea sufre los peores retrasos? 
 
 ```{r}
 
